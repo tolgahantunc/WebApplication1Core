@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,8 +32,9 @@ namespace WebApplication1
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApplication1", Version = "v1" });
             });
-
-            services.AddDbContext<DBConnector>();
+            
+            services.AddDbContext<DemoDBContext>(
+                options => options.UseSqlServer(@"Server=TOLGAHAN-PC;Database=DemoDB;User Id=demodbuser;Password=demodbuser1;Integrated Security=True"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
