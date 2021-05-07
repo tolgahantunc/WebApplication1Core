@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApplication1.Errors;
 using WebApplication1.Models;
 using WebApplication1.Services;
 
@@ -45,15 +46,17 @@ namespace WebApplication1.Controllers
         public async Task<ActionResult<IEnumerable<User>>> SearchUser(string name)
         {
             List<User> lsUser = null;
-            try
-            {
-                var users = await _context.SearchUser(name);
-                lsUser = users.ToList();
-            }
-            catch (Exception ex)
-            {
-                return new ObjectResult("An error occured whilst processing the request") { StatusCode = 500 };
-            }
+            var users = await _context.SearchUser(name);
+            lsUser = users.ToList();
+            //try
+            //{
+            //    var users = await _context.SearchUser(name);
+            //    lsUser = users.ToList();
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw new Exception("An error occured whilst processing the request");
+            //}
 
             if (lsUser == null || lsUser.Count < 1)            
                 return NotFound("User does not exist");            

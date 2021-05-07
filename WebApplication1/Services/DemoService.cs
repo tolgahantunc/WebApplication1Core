@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApplication1.Errors;
 using WebApplication1.Models;
 
 namespace WebApplication1.Services
@@ -28,6 +29,7 @@ namespace WebApplication1.Services
         }
         public async Task<IEnumerable<User>> SearchUser(string name)
         {
+            throw new HttpResponseException("An error occured whilst processing the request");
             if (String.IsNullOrWhiteSpace(name))
                 return null;
 
