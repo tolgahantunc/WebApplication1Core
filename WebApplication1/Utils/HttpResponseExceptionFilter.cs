@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApplication1.Errors
+namespace WebApplication1.Utils
 {
     public class HttpResponseExceptionFilter : IActionFilter, IOrderedFilter
     {
