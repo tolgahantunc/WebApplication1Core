@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Models;
+using WebApplication1.Services;
 
 namespace WebApplication1
 {
@@ -32,9 +33,12 @@ namespace WebApplication1
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApplication1", Version = "v1" });
             });
+
             
             services.AddDbContext<DemoDBContext>(
                 options => options.UseSqlServer(@"Server=TOLGAHAN-PC;Database=DemoDB;User Id=demodbuser;Password=demodbuser1;Integrated Security=True"));
+
+            services.AddScoped<IDemoService, DemoService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -10,12 +10,6 @@ namespace WebApplication1.Models
     {
         public DbSet<User> User { get; set; }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer(
-        //        @"Server=TOLGAHAN-PC;Database=DemoDB;Integrated Security=True");
-        //}
-
         public DemoDBContext(DbContextOptions<DemoDBContext> options)
         : base(options)
         {

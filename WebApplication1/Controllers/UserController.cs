@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
+using WebApplication1.Services;
 
 namespace WebApplication1.Controllers
 {
@@ -13,30 +14,28 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly DemoDBContext _context;
+        private readonly IDemoService _context;
 
-        public UserController(DemoDBContext context)
+        public UserController(IDemoService context)
         {
             _context = context;
         }
 
         // GET: api/User
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
-            return await _context.User.ToListAsync();
+            var users = await _context.GetUsers();
+            return users.ToList();
         }
 
         // GET: api/User/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _context.User.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
+            var user = await _context.GetUser(id);
+            if (user == null)            
+                return NotFound("User does not exist");            
 
             return user;
         }
@@ -48,57 +47,56 @@ namespace WebApplication1.Controllers
             List<User> lsUser = null;
             try
             {
-                lsUser = await _context.User.Where(x => x.Name.Equals(name)).ToListAsync();
+                var users = await _context.SearchUser(name);
+                lsUser = users.ToList();
             }
             catch (Exception ex)
             {
-                return null;
+                return new ObjectResult("An error occured whilst processing the request") { StatusCode = 500 };
             }
 
             if (lsUser == null || lsUser.Count < 1)            
-                return NotFound();            
+                return NotFound("User does not exist");            
 
             return lsUser;
         }
 
         // PUT: api/User/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
             if (id != user.UserId)
-            {
-                return BadRequest();
-            }
+                return BadRequest("User ID and User object does not match");
 
-            _context.Entry(user).State = EntityState.Modified;
-
+            bool retval;
             try
             {
-                await _context.SaveChangesAsync();
+                retval = await _context.PutUser(id, user);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return new ObjectResult("An error occured whilst processing the request") { StatusCode = 500 };
             }
 
             return NoContent();
         }
 
         // POST: api/User
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
+            if (user == null)
+                return BadRequest("User cannot be null");
+
+            bool retval;
+            try
+            {
+                retval = await _context.PostUser(user);
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult("An error occured whilst processing the request") { StatusCode = 500 };
+            }
 
             return CreatedAtAction("GetUser", new { id = user.UserId }, user);
         }
@@ -107,21 +105,17 @@ namespace WebApplication1.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
+            bool retval;
+            try
             {
-                return NotFound();
+                retval = await _context.DeleteUser(id);
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult("An error occured whilst processing the request") { StatusCode = 500 };
             }
 
-            _context.User.Remove(user);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool UserExists(int id)
-        {
-            return _context.User.Any(e => e.UserId == id);
         }
     }
 }
