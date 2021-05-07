@@ -15,7 +15,7 @@ namespace WebApplication1
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.File(@"C:\MyLogs\log", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(@"C:\MyLogs\log.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             try

@@ -35,7 +35,7 @@ namespace WebApplication1
             //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApplication1", Version = "v1" });
             //});
 
-            
+
             services.AddDbContext<DemoDBContext>(
                 options => options.UseSqlServer(@"Server=TOLGAHAN-PC;Database=DemoDB;User Id=demodbuser;Password=demodbuser1;Integrated Security=True"));
 

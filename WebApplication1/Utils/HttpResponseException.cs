@@ -9,11 +9,14 @@ namespace WebApplication1.Utils
     {
         public int Status { get; set; } = 500;
         public object Value { get; set; }
-        public string Message { get; set; }
+        public string MessageToClient { get; set; }
 
-        public HttpResponseException(string message)
+        public Exception InnerExceptionToLog { get; set; }
+
+        public HttpResponseException(string message, Exception realException)
         {
-            Message = message;
+            MessageToClient = message;
+            InnerExceptionToLog = realException;
         }
     }
 }

@@ -25,11 +25,13 @@ namespace WebApplication1.Services
 
         public async Task<User> GetUser(int id)
         {
+            if (id < 0)
+                return null;
+
             return await _context.User.FindAsync(id);
         }
         public async Task<IEnumerable<User>> SearchUser(string name)
         {
-            throw new ArgumentNullException("hebele hübele");
             if (String.IsNullOrWhiteSpace(name))
                 return null;
 

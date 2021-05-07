@@ -26,7 +26,16 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
-            var users = await _context.GetUsers();
+            IEnumerable<User> users;
+            try
+            {
+                users = await _context.GetUsers();
+            }
+            catch (Exception ex)
+            {
+                throw new HttpResponseException("An error occured whilst processing the request", ex);
+            }
+            
             return users.ToList();
         }
 
@@ -34,7 +43,19 @@ namespace WebApplication1.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _context.GetUser(id);
+            if (id < 0)
+                return BadRequest("User ID must be higher than 0");
+
+            User user;
+            try
+            {
+                user = await _context.GetUser(id);
+            }
+            catch (Exception ex)
+            {
+                throw new HttpResponseException("An error occured whilst processing the request", ex);
+            }
+            
             if (user == null)            
                 return NotFound("User does not exist");            
 
@@ -45,18 +66,19 @@ namespace WebApplication1.Controllers
         [HttpGet("Search/{name}")]
         public async Task<ActionResult<IEnumerable<User>>> SearchUser(string name)
         {
+            if (String.IsNullOrWhiteSpace(name))
+                return BadRequest("User name cannot be null");
+
             List<User> lsUser = null;
-            var users = await _context.SearchUser(name);
-            lsUser = users.ToList();
-            //try
-            //{
-            //    var users = await _context.SearchUser(name);
-            //    lsUser = users.ToList();
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw new Exception("An error occured whilst processing the request");
-            //}
+            try
+            {
+                IEnumerable<User> users = await _context.SearchUser(name);
+                lsUser = users.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new HttpResponseException("An error occured whilst processing the request", ex);
+            }
 
             if (lsUser == null || lsUser.Count < 1)            
                 return NotFound("User does not exist");            
@@ -68,6 +90,11 @@ namespace WebApplication1.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             if (id != user.UserId)
                 return BadRequest("User ID and User object does not match");
 
@@ -78,16 +105,24 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return new ObjectResult("An error occured whilst processing the request") { StatusCode = 500 };
+                throw new HttpResponseException("An error occured whilst processing the request", ex);
             }
 
-            return NoContent();
+            if(!retval)
+               throw new HttpResponseException("An error occured whilst adding the user", new Exception("PutUser error"));
+
+            return Ok("User updated");
         }
 
         // POST: api/User
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             if (user == null)
                 return BadRequest("User cannot be null");
 
@@ -98,8 +133,11 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return new ObjectResult("An error occured whilst processing the request") { StatusCode = 500 };
+                throw new HttpResponseException("An error occured whilst processing the request", ex);
             }
+
+            if (!retval)
+                throw new HttpResponseException("An error occured whilst updating the user", new Exception("PostUser error"));
 
             return CreatedAtAction("GetUser", new { id = user.UserId }, user);
         }
@@ -115,10 +153,13 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return new ObjectResult("An error occured whilst processing the request") { StatusCode = 500 };
+                throw new HttpResponseException("An error occured whilst processing the request", ex);
             }
 
-            return NoContent();
+            if (!retval)
+                throw new HttpResponseException("An error occured whilst deleting the user", new Exception("DeleteUser error"));
+
+            return Ok("User deleted");
         }
     }
 }

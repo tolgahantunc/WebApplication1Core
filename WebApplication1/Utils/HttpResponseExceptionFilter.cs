@@ -18,9 +18,10 @@ namespace WebApplication1.Utils
         {
             if (context.Exception is HttpResponseException exception)
             {
-                context.Result = new ObjectResult(exception.Message)
+                Log.Logger.Error(exception.InnerExceptionToLog, String.Empty);
+                context.Result = new ObjectResult(exception.MessageToClient)
                 {
-                    StatusCode = exception.Status,
+                    StatusCode = exception.Status,                    
                 };
                 context.ExceptionHandled = true;
             }
