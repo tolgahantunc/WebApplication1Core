@@ -1,4 +1,4 @@
-# WebApplication1Core
+# .NET Core Web API
 
 - .NET Core 5, Web API  (CRUD operations on User object/table)
 - Database: MS SQL Server (if you need the db please ask for its SQL script)  
